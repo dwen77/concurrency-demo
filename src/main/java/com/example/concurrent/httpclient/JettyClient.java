@@ -3,6 +3,7 @@ package com.example.concurrent.httpclient;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.api.Result;
 import org.eclipse.jetty.client.util.BufferingResponseListener;
 import org.eclipse.jetty.http.HttpMethod;
@@ -21,10 +22,13 @@ public class JettyClient {
     }
 
     public CompletableFuture<String> callbackSend(Integer taskId) {
-        log.info("send nio request {} ", taskId);
+
         CompletableFuture<String> httpResponseCompletableFuture = new CompletableFuture<>();
         httpClient.newRequest("http://127.0.0.1:8080/demo/ping/" + taskId)
                 .method(HttpMethod.GET)
+                .onRequestQueued(request -> log.info("request queued {} ", taskId))
+                .onRequestBegin(request -> log.info("request begin {} ", taskId))
+                .onRequestSuccess(request -> log.info("request success {} ", taskId))
                 .send(new BufferingResponseListener() {
                     @Override
                     public void onComplete(Result result) {

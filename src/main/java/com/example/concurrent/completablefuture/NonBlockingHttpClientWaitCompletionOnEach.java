@@ -12,7 +12,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import java.util.concurrent.*;
 
 @Slf4j
-public class NonBlockingHttpClient {
+public class NonBlockingHttpClientWaitCompletionOnEach {
 
     public static void main(String[] args) throws Exception {
         log.info("CPU Core: " + Runtime.getRuntime().availableProcessors());

@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Slf4j
-public class NonBlockingHttpClient {
+public class NonBlockingHttpClientWaitCompletionOnEach {
 
     public static void main(String[] args) throws Exception {
         run();
@@ -34,7 +34,7 @@ public class NonBlockingHttpClient {
 
     private static Consumer<Integer> sendRequest(JettyClient jettyClient) {
         return ThrowingConsumer.unchecked(taskId -> {
-            log.info("submit task {}", taskId);
+            log.info("run task {}", taskId);
             CompletableFuture<String> completableFuture = jettyClient.callbackSend(taskId);
             completableFuture.get();
         });
