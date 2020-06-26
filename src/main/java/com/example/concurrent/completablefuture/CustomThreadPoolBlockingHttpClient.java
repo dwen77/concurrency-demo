@@ -28,6 +28,7 @@ public class CustomThreadPoolBlockingHttpClient {
         SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
         HttpClient httpClient = new HttpClient(sslContextFactory);
         JettyClient jettyClient = new JettyClient(httpClient);
+        httpClient.setMaxConnectionsPerDestination(300);
         httpClient.start();
         ExecutorService executor = Executors.newCachedThreadPool();
         CompletableFuture<Void> all = CompletableFuture.allOf(sendRequests(jettyClient, executor))

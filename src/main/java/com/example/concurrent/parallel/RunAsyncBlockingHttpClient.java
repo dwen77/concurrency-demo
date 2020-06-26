@@ -10,6 +10,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -17,6 +18,9 @@ import java.util.function.Consumer;
 public class RunAsyncBlockingHttpClient {
 
     public static void main(String[] args) throws Exception {
+        log.info("CPU Core: " + Runtime.getRuntime().availableProcessors());
+        log.info("CommonPool Parallelism: " + ForkJoinPool.commonPool().getParallelism());
+        log.info("CommonPool Common Parallelism: " + ForkJoinPool.getCommonPoolParallelism());
         run();
     }
 
@@ -25,6 +29,7 @@ public class RunAsyncBlockingHttpClient {
         stopWatch.start();
         SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
         HttpClient httpClient = new HttpClient(sslContextFactory);
+        httpClient.setMaxConnectionsPerDestination(300);
         JettyClient jettyClient = new JettyClient(httpClient);
         httpClient.start();
         TaskList.tasks.boxed().parallel().forEach(sendRequest(jettyClient));

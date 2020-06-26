@@ -10,6 +10,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -17,6 +18,9 @@ import java.util.function.Consumer;
 public class BlockingHttpClient {
 
     public static void main(String[] args) throws Exception {
+        log.info("CPU Core: " + Runtime.getRuntime().availableProcessors());
+        log.info("CommonPool Parallelism: " + ForkJoinPool.commonPool().getParallelism());
+        log.info("CommonPool Common Parallelism: " + ForkJoinPool.getCommonPoolParallelism());
         run();
     }
 

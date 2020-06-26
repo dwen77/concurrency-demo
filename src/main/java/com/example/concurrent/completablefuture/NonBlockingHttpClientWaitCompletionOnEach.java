@@ -26,6 +26,7 @@ public class NonBlockingHttpClientWaitCompletionOnEach {
         stopWatch.start();
         SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
         HttpClient httpClient = new HttpClient(sslContextFactory);
+        httpClient.setMaxConnectionsPerDestination(300);
         JettyClient jettyClient = new JettyClient(httpClient);
         httpClient.start();
         CompletableFuture<Void> all = CompletableFuture.allOf(
@@ -45,8 +46,8 @@ public class NonBlockingHttpClientWaitCompletionOnEach {
     private static Runnable sendRequest(JettyClient jettyClient, Integer taskId) {
         return ThrowingRunnable.unchecked(
                 () -> {
-                    log.info("submit task {}", taskId);
                     CompletableFuture<String> completableFuture = jettyClient.callbackSend(taskId);
+                    log.info("wait {}" , taskId);
                     completableFuture.get();
                 }
         );

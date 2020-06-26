@@ -27,6 +27,7 @@ public class BlockingHttpClient {
         stopWatch.start();
         SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
         HttpClient httpClient = new HttpClient(sslContextFactory);
+        httpClient.setMaxConnectionsPerDestination(300);
         JettyClient jettyClient = new JettyClient(httpClient);
         httpClient.start();
         CompletableFuture<Void> all = CompletableFuture.allOf(sendRequests(jettyClient))

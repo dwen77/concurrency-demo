@@ -10,6 +10,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +30,7 @@ public class NonBlockingHttpClientWaitCompletionOnAll {
         SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
         HttpClient httpClient = new HttpClient(sslContextFactory);
         httpClient.setMaxConnectionsPerDestination(300);
-        log.info("max queue per destination {} " , httpClient.getMaxConnectionsPerDestination());
+        httpClient.setExecutor(new QueuedThreadPool(10));
         JettyClient jettyClient = new JettyClient(httpClient);
         httpClient.start();
         CompletableFuture<Void> all = CompletableFuture.allOf(

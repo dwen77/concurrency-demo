@@ -10,6 +10,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 public class NonBlockingHttpClientWaitCompletionOnAll {
 
     public static void main(String[] args) throws Exception {
+        log.info("CPU Core: " + Runtime.getRuntime().availableProcessors());
+        log.info("CommonPool Parallelism: " + ForkJoinPool.commonPool().getParallelism());
+        log.info("CommonPool Common Parallelism: " + ForkJoinPool.getCommonPoolParallelism());
         run();
     }
 
@@ -27,6 +31,7 @@ public class NonBlockingHttpClientWaitCompletionOnAll {
         stopWatch.start();
         SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
         HttpClient httpClient = new HttpClient(sslContextFactory);
+        httpClient.setMaxConnectionsPerDestination(300);
         JettyClient jettyClient = new JettyClient(httpClient);
         httpClient.start();
         CompletableFuture<Void> completableFutures = CompletableFuture.allOf(TaskList.tasks.boxed().parallel().map(sendRequest(jettyClient))
@@ -38,9 +43,6 @@ public class NonBlockingHttpClientWaitCompletionOnAll {
     }
 
     private static Function<Integer, CompletableFuture<String>> sendRequest(JettyClient jettyClient) {
-        return ThrowingFunction.unchecked(taskId -> {
-            log.info("run task {}", taskId);
-            return jettyClient.callbackSend(taskId);
-        });
+        return ThrowingFunction.unchecked(taskId -> jettyClient.callbackSend(taskId));
     }
 }
